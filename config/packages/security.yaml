@@ -10,12 +10,32 @@ security:
                 class: App\Entity\User
                 property: username
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            lazy: true
-            provider: app_user_provider
+#        dev:
+#            pattern: ^/(_(profiler|wdt)|css|images|js)/
+#            security: false
+#        main:
+#            lazy: true
+#            provider: app_user_provider
+
+        login:
+            pattern: ^/api/v1/login_check
+            stateless: true
+            json_login:
+                check_path: /api/v1/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api/v1
+            stateless: true
+            entry_point: jwt
+            json_login:
+                check_path: /api/v1/login_check # or, if you have defined a route for your login path, the route name you used
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
+            refresh_jwt:
+                check_path: /api/v1/refresh_token
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -26,6 +46,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/api/v1/(login_check|refresh_token), roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/doc, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
