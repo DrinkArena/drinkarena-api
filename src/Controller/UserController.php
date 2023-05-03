@@ -28,4 +28,17 @@ class UserController extends AbstractController
         );
         return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
     }
+
+    #[Route('/me', name: 'api.user.get_self', methods: ['GET'])]
+    public function get_self(
+        SerializerInterface $serializer
+    ): JsonResponse
+    {
+        $userInfos = $serializer->serialize(
+            $this->getUser(),
+            'json',
+            SerializationContext::create()->setGroups(['user:base'])
+        );
+        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
+    }
 }
