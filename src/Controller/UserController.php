@@ -4,14 +4,19 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/v1/user')]
 class UserController extends AbstractController
@@ -57,5 +62,42 @@ class UserController extends AbstractController
             SerializationContext::create()->setGroups(['user:base'])
         );
         return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
+    }
+
+    #[Route('', name: 'api.user.create', methods: ['POST'])]
+    public function create(
+        UserPasswordHasherInterface $userPasswordHasher,
+        EntityManagerInterface      $entityManager,
+        SerializerInterface         $serializer,
+        ValidatorInterface          $validator,
+        Request                     $request
+    ): JsonResponse
+    {
+        $userInput = $serializer->deserialize(
+            $request->getContent(),
+            User::class,
+            'json',
+            DeserializationContext::create()->setGroups(['user:register'])
+        );
+
+        $user = new User();
+        $user->setUsername($userInput->getUsername())
+            ->setPassword($userPasswordHasher->hashPassword($user, $userInput->getPassword()))
+            ->setRoles(['ROLE_USER']);
+
+        $errors = $validator->validate($user);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['user:base'])),
+            Response::HTTP_CREATED,
+            ['accept' => 'json'],
+            true
+        );
     }
 }
