@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,6 +38,21 @@ class UserController extends AbstractController
     {
         $userInfos = $serializer->serialize(
             $this->getUser(),
+            'json',
+            SerializationContext::create()->setGroups(['user:base'])
+        );
+        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
+    }
+
+    #[Route('s', name: 'api.user.get_all', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function get_all(
+        SerializerInterface $serializer,
+        UserRepository      $userRepository
+    ): JsonResponse
+    {
+        $userInfos = $serializer->serialize(
+            $userRepository->findAll(),
             'json',
             SerializationContext::create()->setGroups(['user:base'])
         );
