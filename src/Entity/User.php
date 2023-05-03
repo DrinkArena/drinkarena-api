@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -18,18 +19,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:base'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:base'])]
+    #[ORM\Column(length: 24, unique: true)]
+    #[Groups(['user:base', 'user:register'])]
+    #[Assert\Length(
+        min: 2,
+        max: 24,
+        minMessage: 'Your username must be at least {{ limit }} characters long',
+        maxMessage: 'Your username cannot be longer than {{ limit }} characters',
+    )]
     private ?string $username = null;
 
     #[ORM\Column]
     #[Groups(['user:base'])]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
+    #[Groups(['user:register'])]
     private ?string $password = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
