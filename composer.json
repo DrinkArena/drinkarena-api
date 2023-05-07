@@ -14,7 +14,9 @@
         "gesdinet/jwt-refresh-token-bundle": "^1.1",
         "jms/serializer-bundle": "^5.2",
         "lexik/jwt-authentication-bundle": "^2.18",
+        "nelmio/api-doc-bundle": "^4.11",
         "sensio/framework-extra-bundle": "^6.2",
+        "symfony/asset": "6.2.*",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
         "symfony/flex": "^2",
@@ -22,8 +24,11 @@
         "symfony/maker-bundle": "^1.48",
         "symfony/runtime": "6.2.*",
         "symfony/security-bundle": "6.2.*",
+        "symfony/twig-bundle": "6.2.*",
         "symfony/validator": "6.2.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/yaml": "6.2.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0"
     },
     "config": {
         "allow-plugins": {
