@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use OpenApi\Attributes as OA;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +25,17 @@ class UserController extends AbstractController
 {
     #[Route('/{userId<\d+>}', name: 'api.user.get_by_id', methods: ['GET'])]
     #[ParamConverter('user', options: ['id' => 'userId'])]
+    #[OA\Parameter(
+        name: 'userId',
+        description: 'Field for unique user identifier (integer)',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Return infos of one user by id',
+        content: new Model(type: User::class, groups: ['user:base'])
+    )]
     public function get_by_id(
         SerializerInterface $serializer,
         User                $user
