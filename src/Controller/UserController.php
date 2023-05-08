@@ -69,6 +69,14 @@ class UserController extends AbstractController
 
     #[Route('s', name: 'api.user.get_all', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
+    #[OA\Response(
+        response: 200,
+        description: 'Return all users infos in list (only admin)',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['user:base']))
+        )
+    )]
     public function get_all(
         SerializerInterface $serializer,
         UserRepository      $userRepository
