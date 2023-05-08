@@ -91,6 +91,15 @@ class UserController extends AbstractController
     }
 
     #[Route('', name: 'api.user.create', methods: ['POST'])]
+    #[OA\RequestBody(
+        description: 'Specify credentials you want to set for the user',
+        content: new Model(type: User::class, groups: ['user:register'])
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Create user account (registration)',
+        content: new Model(type: User::class, groups: ['user:base'])
+    )]
     public function create(
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface      $entityManager,
