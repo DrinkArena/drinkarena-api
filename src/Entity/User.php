@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use OpenApi\Attributes as OA;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -29,10 +30,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $username = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'json')]
     #[Groups(['user:base'])]
     #[Assert\NotBlank]
     #[Assert\NotNull]
+    #[OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'))]
     private array $roles = [];
 
     #[ORM\Column]
