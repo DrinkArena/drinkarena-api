@@ -50,6 +50,11 @@ class UserController extends AbstractController
     }
 
     #[Route('/me', name: 'api.user.get_self', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Return current connected user infos',
+        content: new Model(type: User::class, groups: ['user:base'])
+    )]
     public function get_self(
         SerializerInterface $serializer
     ): JsonResponse
