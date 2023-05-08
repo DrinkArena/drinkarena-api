@@ -1,19 +1,38 @@
-version: '3'
+version: '3.9'
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-15}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+  proxy:
+    container_name: drinkarena-proxy
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.proxy
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - ./.docker/drinkarena.conf.template:/etc/nginx/templates/default.conf.template
+    depends_on:
+#      - database
+      - php
+    environment:
+      PROXY_DOMAIN: drinkarena.eristich.dev
+      PROXY_DOMAIN_ALIAS: localhost
+
+  php:
+    container_name: drinkarena-php
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile.php
+    ports:
+      - "9000:9000"
+#    volumes:
+      #- ./:/var/www/drinkarena
+#    depends_on:
+#      - database
+    environment:
+#      DATABASE_URL: "postgresql://drinkarena:root@database:5432/drinkarena?serverVersion=15&charset=utf8"
+      DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE}
 
 volumes:
 ###> doctrine/doctrine-bundle ###

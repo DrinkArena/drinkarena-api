@@ -1,0 +1,28 @@
+name: Deploy drinkarena in dev
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      # Prepare .env file for production
+      - name: Make production envfile
+        uses: SpicyPizza/create-envfile@v1
+        with:
+          envkey_APP_ENV: dev
+          envkey_APP_DEBUG: true
+          envkey_APP_SECRET: ${{ secrets.APP_SECRET }}
+          envkey_DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+          file_name: .env.dev
+          
+      - name: launch docker compose project
+        run: |
+          docker compose up -d --build

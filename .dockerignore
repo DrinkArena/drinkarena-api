@@ -1,0 +1,8 @@
+/var
+/vendor
+.gitignore
+.git/
+.idea/
+.docker/
+docker-compose.yml
+
