@@ -118,6 +118,7 @@ class UserController extends AbstractController
         $user = new User();
         $user->setUsername($userInput->getUsername())
             ->setPassword($userPasswordHasher->hashPassword($user, $userInput->getPassword()))
+            ->setEmail($userInput->getEmail())
             ->setRoles(['ROLE_USER']);
 
         $errors = $validator->validate($user);
