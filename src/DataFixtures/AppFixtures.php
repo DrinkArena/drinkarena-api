@@ -35,6 +35,7 @@ class AppFixtures extends Fixture
         $user
             ->setUsername('admin')
             ->setPassword($this->userPasswordHasher->hashPassword($user, 'Test#69'))
+            ->setEmail('admin@eristich.dev')
             ->setRoles(['ROLE_ADMIN'])
         ;
         $this->manager->persist($user);
@@ -48,6 +49,7 @@ class AppFixtures extends Fixture
             $user
                 ->setUsername($this->faker->userName())
                 ->setPassword($this->userPasswordHasher->hashPassword($user, 'Test#69'))
+                ->setEmail($this->faker->email())
                 ->setRoles(['ROLE_USER'])
             ;
             $this->manager->persist($user);
