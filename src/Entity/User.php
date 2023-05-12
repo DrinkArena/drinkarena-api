@@ -45,6 +45,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:base'])]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 255, unique: true)]
+    #[Groups(['user:base', 'user:register'])]
+    #[Assert\Email(message: 'The email {{ value }} is not valid.')]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    private ?string $email = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -128,6 +135,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }
