@@ -52,6 +52,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private ?string $email = null;
 
+    #[ORM\Column(length: 32, nullable: true)]
+    #[Groups(['user:recover-password'])]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    private ?string $recoveryCode = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $recoveryCodeExpiration = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -147,6 +156,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getRecoveryCode(): ?string
+    {
+        return $this->recoveryCode;
+    }
+
+    public function setRecoveryCode(?string $recoveryCode): self
+    {
+        $this->recoveryCode = $recoveryCode;
+
+        return $this;
+    }
+
+    public function getRecoveryCodeExpiration(): ?\DateTimeImmutable
+    {
+        return $this->recoveryCodeExpiration;
+    }
+
+    public function setRecoveryCodeExpiration(?\DateTimeImmutable $recoveryCodeExpiration): self
+    {
+        $this->recoveryCodeExpiration = $recoveryCodeExpiration;
 
         return $this;
     }
