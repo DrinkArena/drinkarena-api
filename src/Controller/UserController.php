@@ -12,8 +12,11 @@ use JMS\Serializer\SerializationContext;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -115,16 +118,16 @@ class UserController extends AbstractController
             DeserializationContext::create()->setGroups(['user:register'])
         );
 
+        $errors = $validator->validate($userInput, null, ['user:register']);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
         $user = new User();
         $user->setUsername($userInput->getUsername())
             ->setPassword($userPasswordHasher->hashPassword($user, $userInput->getPassword()))
             ->setEmail($userInput->getEmail())
             ->setRoles(['ROLE_USER']);
-
-        $errors = $validator->validate($user);
-        if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
-        }
 
         $entityManager->persist($user);
         $entityManager->flush();
