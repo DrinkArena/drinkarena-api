@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     #[ORM\Column]
-    #[Groups(['user:register'])]
+    #[Groups(['user:register', 'user:recover-password'])]
     private ?string $password = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
@@ -46,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(['user:base', 'user:register'])]
+    #[Groups(['user:base', 'user:register', 'user:recover-password'])]
     #[Assert\Email(message: 'The email {{ value }} is not valid.')]
     #[Assert\NotBlank]
     #[Assert\NotNull]
