@@ -139,4 +139,43 @@ class UserController extends AbstractController
             true
         );
     }
+
+    #[Route('/request-forgot-password', name: 'api.user.request_forgot_password', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Send email to recover user password'
+    )]
+    public function request_forgot_password(
+        MailerInterface         $mailer,
+        Request                 $request,
+        UserRepository          $userRepository
+    ): JsonResponse
+    {
+        $targetEmail = $request->query->get('email') ?? throw new BadRequestException('The email field is missing in query');
+        $user = $userRepository->findOneBy(['email' => $targetEmail]);
+
+        if (!$user instanceof User) {
+            throw new BadRequestException('The account for this email does not exist');
+        }
+
+        $recoverCode = [];
+        for ($i = 0; $i < 10; $i++) {
+            $recoverCode[] = mt_rand(1, 9);
+        }
+        $recoverCode = implode('', $recoverCode);
+
+        $user->setRecoveryCode($recoverCode);
+        $user->setRecoveryCodeExpiration((new \DateTimeImmutable())->modify('+ 2 hour'));
+        $userRepository->save($user, true);
+
+        $email = (new Email())
+            ->from('drinkarena.game@gmail.com')
+            ->to($targetEmail)
+            ->subject('Drink Arena - Mot de passe oublié')
+            ->text('Votre code de récupération pour changer de mot de passe, il sera valable pendant 2 heures : ' . $recoverCode)
+        ;
+        $mailer->send($email); // todo: handle error of email sender
+
+        return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'json'], false);
+    }
 }
