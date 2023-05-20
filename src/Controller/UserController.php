@@ -141,6 +141,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/request-forgot-password', name: 'api.user.request_forgot_password', methods: ['GET'])]
+    #[OA\Parameter(
+        name: 'email',
+        description: 'Email of the user who lost his email',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
     #[OA\Response(
         response: 200,
         description: 'Send email to recover user password'
