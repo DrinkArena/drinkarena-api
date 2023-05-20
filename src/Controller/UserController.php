@@ -178,4 +178,47 @@ class UserController extends AbstractController
 
         return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'json'], false);
     }
+
+    #[Route('/recover-password', name: 'api.user.recover_password', methods: ['POST'])]
+    #[OA\Response(
+        response: 201,
+        description: 'Send email to recover user password'
+    )]
+    public function recover_password(
+        SerializerInterface         $serializer,
+        Request                     $request,
+        ValidatorInterface          $validator,
+        UserRepository              $userRepository,
+        UserPasswordHasherInterface $userPasswordHasher
+    ): JsonResponse
+    {
+        $userInput = $serializer->deserialize(
+            $request->getContent(),
+            User::class,
+            'json',
+            DeserializationContext::create()->setGroups(['user:recover-password'])
+        );
+
+        $errors = $validator->validate($userInput, null, ['user:recover-password']);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $user = $userRepository->findOneBy(['email' => $userInput->getEmail()]);
+
+        if ($user->getRecoveryCode() !== $userInput->getRecoveryCode()) {
+            throw new BadRequestException('The recovery code provided is wrong');
+        }
+
+        if ($user->getRecoveryCodeExpiration() < (new \DateTimeImmutable())) {
+            throw new BadRequestException('The recovery code has expired');
+        }
+
+        $user->setPassword($userPasswordHasher->hashPassword($user, $userInput->getPassword()));
+        $user->setRecoveryCode(null);
+        $user->setRecoveryCodeExpiration(null);
+        $userRepository->save($user, true);
+
+        return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'json'], false);
+    }
 }
