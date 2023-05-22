@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use OpenApi\Attributes as OA;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
@@ -61,9 +63,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $recoveryCodeExpiration = null;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: GameRoom::class)]
+    private Collection $gameRooms;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->gameRooms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +186,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRecoveryCodeExpiration(?\DateTimeImmutable $recoveryCodeExpiration): self
     {
         $this->recoveryCodeExpiration = $recoveryCodeExpiration;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GameRoom>
+     */
+    public function getGameRooms(): Collection
+    {
+        return $this->gameRooms;
+    }
+
+    public function addGameRoom(GameRoom $gameRoom): self
+    {
+        if (!$this->gameRooms->contains($gameRoom)) {
+            $this->gameRooms->add($gameRoom);
+            $gameRoom->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGameRoom(GameRoom $gameRoom): self
+    {
+        if ($this->gameRooms->removeElement($gameRoom)) {
+            // set the owning side to null (unless already changed)
+            if ($gameRoom->getOwner() === $this) {
+                $gameRoom->setOwner(null);
+            }
+        }
 
         return $this;
     }
