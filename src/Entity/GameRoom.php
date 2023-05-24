@@ -15,6 +15,7 @@ class GameRoom
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['room:base'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -26,7 +27,7 @@ class GameRoom
         minMessage: 'Your username must be at least {{ limit }} characters long',
         maxMessage: 'Your username cannot be longer than {{ limit }} characters',
     )]
-    #[Groups(['room:create'])]
+    #[Groups(['room:create', 'room:base'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'ownedRooms')]
@@ -37,9 +38,11 @@ class GameRoom
     #[Assert\NotBlank]
     #[Assert\NotNull]
     #[Assert\Choice(choices: ['WAITING_PLAYER', 'STARTED', 'FINISHED'])]
+    #[Groups(['room:base'])]
     private ?string $state = null;
 
     #[ORM\Column]
+    #[Groups(['room:base'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'playedRooms')]
