@@ -101,4 +101,28 @@ class GameRoomController extends AbstractController
             false
         );
     }
+
+    #[Route('/{roomId<\d+>}/leave', name: 'api.room.leave', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
+    public function leave(
+        GameRoom                $room,
+        EntityManagerInterface  $entityManager,
+        GameRoomRepository      $gameRoomRepository
+    ): JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        if ($room->getOwner() === $user && $room->getState() !== 'FINISHED') {
+            $room->setState('FINISHED');
+        }
+
+        $room->removeParticipant($user);
+        $gameRoomRepository->save($room, true);
+
+        return new JsonResponse(
+            null,
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            false
+        );
+    }
 }
