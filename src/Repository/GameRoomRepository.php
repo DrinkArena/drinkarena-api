@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\GameRoom;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,6 +38,20 @@ class GameRoomRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function checkToJoinGame(User $user): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r.id')
+            ->innerJoin('r.participants', 'p')
+            ->where('p.id = :userId')
+            ->andWhere('r.state != :roomState')
+            ->setParameter('userId', $user->getId())
+            ->setParameter('roomState', 'FINISHED')
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
 //    /**
