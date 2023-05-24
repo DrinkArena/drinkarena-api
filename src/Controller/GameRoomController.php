@@ -125,4 +125,19 @@ class GameRoomController extends AbstractController
             false
         );
     }
+
+    #[Route('/{roomId<\d+>}', name: 'api.room.get_by_id', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
+    public function get_by_id(
+        GameRoom                $room,
+        SerializerInterface     $serializer
+    ): JsonResponse
+    {
+        return new JsonResponse(
+            $serializer->serialize($room, 'json', SerializationContext::create()->setGroups(['room:detail'])),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
+    }
 }
