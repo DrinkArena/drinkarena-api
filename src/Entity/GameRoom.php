@@ -3,7 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\GameRoomRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GameRoomRepository::class)]
 class GameRoom
@@ -14,21 +18,38 @@ class GameRoom
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Length(
+        min: 3,
+        max: 24,
+        minMessage: 'Your username must be at least {{ limit }} characters long',
+        maxMessage: 'Your username cannot be longer than {{ limit }} characters',
+    )]
+    #[Groups(['room:create'])]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'gameRooms')]
+    #[ORM\ManyToOne(inversedBy: 'ownedRooms')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Choice(choices: ['WAITING_PLAYER', 'STARTED', 'FINISHED'])]
     private ?string $state = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'playedRooms')]
+    private Collection $participants;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->state = 'WAITING_PLAYER';
+        $this->participants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,6 +101,30 @@ class GameRoom
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getParticipants(): Collection
+    {
+        return $this->participants;
+    }
+
+    public function addParticipant(User $participant): self
+    {
+        if (!$this->participants->contains($participant)) {
+            $this->participants->add($participant);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipant(User $participant): self
+    {
+        $this->participants->removeElement($participant);
 
         return $this;
     }

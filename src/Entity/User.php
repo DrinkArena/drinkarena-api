@@ -64,12 +64,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $recoveryCodeExpiration = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: GameRoom::class)]
-    private Collection $gameRooms;
+    private Collection $ownedRooms;
+
+    #[ORM\ManyToMany(targetEntity: GameRoom::class, mappedBy: 'participants')]
+    private Collection $playedRooms;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->gameRooms = new ArrayCollection();
+        $this->ownedRooms = new ArrayCollection();
+        $this->playedRooms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -193,28 +197,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, GameRoom>
      */
-    public function getGameRooms(): Collection
+    public function getOwnedRooms(): Collection
     {
-        return $this->gameRooms;
+        return $this->ownedRooms;
     }
 
-    public function addGameRoom(GameRoom $gameRoom): self
+    public function addOwnedRoom(GameRoom $gameRoom): self
     {
-        if (!$this->gameRooms->contains($gameRoom)) {
-            $this->gameRooms->add($gameRoom);
+        if (!$this->ownedRooms->contains($gameRoom)) {
+            $this->ownedRooms->add($gameRoom);
             $gameRoom->setOwner($this);
         }
 
         return $this;
     }
 
-    public function removeGameRoom(GameRoom $gameRoom): self
+    public function removeOwnedRoom(GameRoom $gameRoom): self
     {
-        if ($this->gameRooms->removeElement($gameRoom)) {
+        if ($this->ownedRooms->removeElement($gameRoom)) {
             // set the owning side to null (unless already changed)
             if ($gameRoom->getOwner() === $this) {
                 $gameRoom->setOwner(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GameRoom>
+     */
+    public function getPlayedRooms(): Collection
+    {
+        return $this->playedRooms;
+    }
+
+    public function addPlayedRoom(GameRoom $playedRoom): self
+    {
+        if (!$this->playedRooms->contains($playedRoom)) {
+            $this->playedRooms->add($playedRoom);
+            $playedRoom->addParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlayedRoom(GameRoom $playedRoom): self
+    {
+        if ($this->playedRooms->removeElement($playedRoom)) {
+            $playedRoom->removeParticipant($this);
         }
 
         return $this;
