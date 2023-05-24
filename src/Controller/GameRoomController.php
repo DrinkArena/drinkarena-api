@@ -140,4 +140,71 @@ class GameRoomController extends AbstractController
             true
         );
     }
+
+    #[Route('', name: 'api.room.search', methods: ['GET'])]
+    #[OA\Parameter(
+        name: 'page',
+        description: 'Field to paginate data (offset)',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Parameter(
+        name: 'limit',
+        description: 'Field for max room displayed per request',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Parameter(
+        name: 'name',
+        description: 'Field to search explicit room name (case sensitivity)',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'order',
+        description: 'Field to order by room creation',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'status',
+        description: 'Field to filter current room status',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Return a list of game rooms',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: GameRoom::class, groups: ['room:base']))
+        )
+    )]
+    public function search(
+        Request                 $request,
+        GameRoomRepository      $gameRoomRepository,
+        SerializerInterface     $serializer
+    ): JsonResponse
+    {
+        $page = $request->query->getInt('page', 1);
+        $limit = $request->query->getInt('limit', 20);
+        $name = $request->query->get('name', '');
+        $order = strtoupper($request->query->get('order', 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
+        $status = strtoupper($request->query->get('status', 'WAITING_PLAYER'));
+        $limit = $limit > 40 ? 20 : $limit;
+        in_array($status, ['WAITING_PLAYER', 'STARTED', 'FINISHED']) ? true : throw new BadRequestException('The status parameter is not valid');
+
+        $criteria = ['state' => $status];
+        if (!empty($name)) {
+            $criteria['name'] = $name;
+        }
+        $rooms = $gameRoomRepository->findBy($criteria, ['createdAt' => $order], $limit, $page - 1);
+
+        return new JsonResponse(
+            $serializer->serialize($rooms, 'json', SerializationContext::create()->setGroups(['room:base'])),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
+    }
 }
