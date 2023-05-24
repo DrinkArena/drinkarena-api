@@ -77,4 +77,28 @@ class GameRoomController extends AbstractController
             true
         );
     }
+
+    #[Route('/{roomId<\d+>}/join', name: 'api.room.join', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
+    public function join(
+        GameRoom                $room,
+        EntityManagerInterface  $entityManager,
+        GameRoomRepository      $gameRoomRepository
+    ): JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        if (!empty($gameRoomRepository->checkToJoinGame($user))) {
+            return new JsonResponse(null, Response::HTTP_BAD_REQUEST, [], false);
+        }
+
+        $room->addParticipant($user);
+        $gameRoomRepository->save($room, true);
+
+        return new JsonResponse(
+            null,
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            false
+        );
+    }
 }
