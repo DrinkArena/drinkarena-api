@@ -19,6 +19,9 @@ $ cd drinkarena-api
 (drinkarena-api) $ git config user.email "<Adresse Mail>"
 ```
 
+> ⚠️ You need to configure the Mercure Hub and the Mail Provider in **.env** file for all features :
+> **MAILER_DSN, MERCURE_URL, MERCURE_PUBLIC_URL, MERCURE_JWT_SECRET**
+
 #### Configure project & Launch
 
 ```sh
