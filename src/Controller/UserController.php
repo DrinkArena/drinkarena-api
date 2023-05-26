@@ -186,6 +186,10 @@ class UserController extends AbstractController
     }
 
     #[Route('/recover-password', name: 'api.user.recover_password', methods: ['POST'])]
+    #[OA\RequestBody(
+        description: 'Specify information to recover user password (no logged)',
+        content: new Model(type: User::class, groups: ['user:recover-password'])
+    )]
     #[OA\Response(
         response: 201,
         description: 'Send email to recover user password'
