@@ -16,6 +16,9 @@ class Pledge
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $type = null;
+
     #[ORM\ManyToOne(inversedBy: 'pledges')]
     private ?User $owner = null;
 
@@ -25,6 +28,7 @@ class Pledge
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->type = 'ACTION';
     }
 
     public function getId(): ?int
@@ -44,9 +48,28 @@ class Pledge
         return $this;
     }
 
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
     }
 
     public function getOwner(): ?User
@@ -57,13 +80,6 @@ class Pledge
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
-
-        return $this;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }
