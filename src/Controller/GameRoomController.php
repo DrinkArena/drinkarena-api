@@ -22,6 +22,15 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 #[Route('/api/v1/room')]
+#[OA\Tag(name: 'Game Room')]
+#[OA\Response(
+    response: 400,
+    description: 'Bad request'
+)]
+#[OA\Response(
+    response: 401,
+    description: 'Unauthorized'
+)]
 class GameRoomController extends AbstractController
 {
     // todo: return SSE data source in response
