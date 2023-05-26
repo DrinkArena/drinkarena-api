@@ -69,11 +69,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: GameRoom::class, mappedBy: 'participants')]
     private Collection $playedRooms;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pledge::class)]
+    private Collection $pledges;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->ownedRooms = new ArrayCollection();
         $this->playedRooms = new ArrayCollection();
+        $this->pledges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -246,6 +250,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->playedRooms->removeElement($playedRoom)) {
             $playedRoom->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pledge>
+     */
+    public function getPledges(): Collection
+    {
+        return $this->pledges;
+    }
+
+    public function addPledge(Pledge $pledge): self
+    {
+        if (!$this->pledges->contains($pledge)) {
+            $this->pledges->add($pledge);
+            $pledge->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removePledge(Pledge $pledge): self
+    {
+        if ($this->pledges->removeElement($pledge)) {
+            // set the owning side to null (unless already changed)
+            if ($pledge->getOwner() === $this) {
+                $pledge->setOwner(null);
+            }
         }
 
         return $this;
