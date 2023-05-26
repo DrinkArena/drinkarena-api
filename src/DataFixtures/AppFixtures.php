@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\GameRoom;
+use App\Entity\Pledge;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -29,6 +30,7 @@ class AppFixtures extends Fixture
         $this->makeAdmin();
         $this->makeUser(15);
         $this->makeRoom(20, 40);
+        $this->makePledge();
     }
 
     private function makeAdmin(): void
@@ -73,6 +75,24 @@ class AppFixtures extends Fixture
                 ->addParticipant($currentOwner)
             ;
             $this->manager->persist($gameRoom);
+        }
+        $this->manager->flush();
+    }
+
+    private function makePledge(): void
+    {
+        $pledges = json_decode(file_get_contents(__DIR__ . '/pledge.json'));
+        $allUser = $this->manager->getRepository(User::class)->findAll();
+        for ($i = 0; $i < count($pledges); $i++) {
+            $currentOwner = $this->faker->randomElement($allUser);
+            if (random_int(1, 20) <= 4) {
+                $currentOwner = null;
+            }
+            $pledge = (new Pledge())
+                ->setTitle($pledges[$i])
+                ->setOwner($currentOwner)
+            ;
+            $this->manager->persist($pledge);
         }
         $this->manager->flush();
     }
