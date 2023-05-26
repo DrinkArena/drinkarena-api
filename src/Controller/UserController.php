@@ -24,6 +24,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/v1/user')]
+#[OA\Tag(name: 'User')]
+#[OA\Response(
+    response: 400,
+    description: 'Bad request'
+)]
+#[OA\Response(
+    response: 401,
+    description: 'Unauthorized'
+)]
 class UserController extends AbstractController
 {
     #[Route('/{userId<\d+>}', name: 'api.user.get_by_id', methods: ['GET'])]
