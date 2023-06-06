@@ -250,6 +250,9 @@ class GameRoomController extends AbstractController
             $gameRoomRepository->save($room, true);
         }
 
+        // todo: count number of pledges elapsed in game session
+        // todo: allow to add default pledge if there aren't enough user pledges
+
         return new JsonResponse(
             $serializer->serialize($pledge, 'json', SerializationContext::create()->setGroups(['pledge:detail'])),
             Response::HTTP_OK,
