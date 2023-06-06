@@ -89,6 +89,12 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[OA\Parameter(
+        name: 'roomId',
+        description: 'The game room ID',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[Route('/{roomId<\d+>}/join', name: 'api.room.join', methods: ['GET'])]
     #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function join(
@@ -113,6 +119,12 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[OA\Parameter(
+        name: 'roomId',
+        description: 'The game room ID',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[Route('/{roomId<\d+>}/leave', name: 'api.room.leave', methods: ['GET'])]
     #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function leave(
@@ -137,6 +149,12 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[OA\Parameter(
+        name: 'roomId',
+        description: 'The game room ID',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[Route('/{roomId<\d+>}', name: 'api.room.get_by_id', methods: ['GET'])]
     #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function get_by_id(
