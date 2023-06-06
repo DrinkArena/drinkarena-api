@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PledgeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PledgeRepository::class)]
 class Pledge
@@ -11,18 +12,23 @@ class Pledge
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['pledge:base', 'pledge:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['pledge:base', 'pledge:detail'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['pledge:base', 'pledge:detail'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'pledges')]
+    #[Groups(['pledge:detail'])]
     private ?User $owner = null;
 
     #[ORM\Column]
+    #[Groups(['pledge:base', 'pledge:detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
