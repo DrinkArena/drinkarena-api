@@ -16,7 +16,7 @@ class Pledge
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['pledge:base', 'pledge:detail'])]
+    #[Groups(['pledge:base', 'pledge:detail', 'pledge:create'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 50)]
