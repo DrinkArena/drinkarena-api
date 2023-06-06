@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Pledge;
 use App\Entity\User;
 use App\Entity\GameRoom;
 use App\Repository\PledgeRepository;
