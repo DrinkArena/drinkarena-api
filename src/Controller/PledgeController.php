@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 #[Route('/api/v1/pledge')]
 #[OA\Tag(name: 'Pledge')]
@@ -81,5 +82,31 @@ class PledgeController extends AbstractController
             ['accept' => 'json'],
             true
         );
+    }
+
+    #[Route('/{pledgeId<\d+>}', name: 'api.pledge.remove', methods: ['DELETE'])]
+    #[ParamConverter('pledge', options: ['id' => 'pledgeId'])]
+    #[OA\Parameter(
+        name: 'pledgeId',
+        description: 'The pledge ID',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'Remove pledge card'
+    )]
+    public function remove(
+        Pledge                  $pledge,
+        PledgeRepository        $pledgeRepository
+    ): JsonResponse
+    {
+        if ($pledge->getOwner() !== $this->getUser()) {
+            throw new BadRequestException('You are not authorized to remove this pledge');
+        }
+
+        $pledgeRepository->remove($pledge, true);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT, ['accept' => 'json'], false);
     }
 }
