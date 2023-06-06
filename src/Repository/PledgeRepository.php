@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\GameRoom;
 use App\Entity\Pledge;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,6 +38,19 @@ class PledgeRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findParticipantPledgeIds(GameRoom $room): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p.id')
+            ->innerJoin('p.owner', 'o')
+            ->innerJoin('o.playedRooms', 'pr')
+            ->where('pr.id = :roomId')
+            ->setParameter('roomId', $room->getId())
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
 //    /**
