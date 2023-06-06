@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Pledge;
 use App\Entity\User;
 use App\Entity\GameRoom;
+use App\Repository\PledgeRepository;
 use OpenApi\Attributes as OA;
 use App\Repository\UserRepository;
 use App\Repository\GameRoomRepository;
@@ -211,6 +213,45 @@ class GameRoomController extends AbstractController
 
         return new JsonResponse(
             $serializer->serialize($rooms, 'json', SerializationContext::create()->setGroups(['room:base'])),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
+    }
+
+    #[OA\Parameter(
+        name: 'roomId',
+        description: 'The game room ID',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[Route('/{roomId<\d+>}/pledge/next', name: 'api.room.next_pledge', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
+    public function next_pledge(
+        GameRoom                $room,
+        SerializerInterface     $serializer,
+        PledgeRepository        $pledgeRepository,
+        GameRoomRepository      $gameRoomRepository
+    ): JsonResponse
+    {
+        if ($room->getOwner() !== $this->getUser()) {
+            throw new BadRequestException('You are not the owner of the game room');
+        }
+
+        if ($room->getState() === 'FINISHED') {
+            throw new BadRequestException('The game session is over');
+        }
+
+        $pledgeId = array_rand($pledgeRepository->findParticipantPledgeIds($room));
+        $pledge = $pledgeRepository->find($pledgeId);
+
+        if ($room->getState() === 'WAITING_PLAYER') {
+            $room->setState('STARTED');
+            $gameRoomRepository->save($room, true);
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($pledge, 'json', SerializationContext::create()->setGroups(['pledge:detail'])),
             Response::HTTP_OK,
             ['accept' => 'json'],
             true
