@@ -32,7 +32,7 @@ class GameRoom
 
     #[ORM\ManyToOne(inversedBy: 'ownedRooms')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['room:detail'])]
+    #[Groups(['room:base', 'room:detail'])]
     private ?User $owner = null;
 
     #[ORM\Column(length: 255)]

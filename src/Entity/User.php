@@ -19,11 +19,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:base', 'room:detail', 'pledge:detail'])]
+    #[Groups(['user:base', 'room:base', 'room:detail', 'pledge:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 24, unique: true)]
-    #[Groups(['user:base', 'user:register', 'room:detail', 'pledge:detail'])]
+    #[Groups(['user:base', 'user:register', 'room:base', 'room:detail', 'pledge:detail'])]
     #[Assert\Length(
         min: 2,
         max: 24,
@@ -44,7 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    #[Groups(['user:base', 'room:detail', 'pledge:detail'])]
+    #[Groups(['user:base', 'room:base', 'room:detail', 'pledge:detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 255, unique: true)]
