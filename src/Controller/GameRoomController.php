@@ -88,14 +88,14 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[Route('/{roomId<\d+>}/join', name: 'api.room.join', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
     #[OA\Parameter(
         name: 'roomId',
         description: 'The game room ID',
         in: 'path',
         schema: new OA\Schema(type: 'integer')
     )]
-    #[Route('/{roomId<\d+>}/join', name: 'api.room.join', methods: ['GET'])]
-    #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function join(
         GameRoom                $room,
         EntityManagerInterface  $entityManager,
@@ -118,14 +118,14 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[Route('/{roomId<\d+>}/leave', name: 'api.room.leave', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
     #[OA\Parameter(
         name: 'roomId',
         description: 'The game room ID',
         in: 'path',
         schema: new OA\Schema(type: 'integer')
     )]
-    #[Route('/{roomId<\d+>}/leave', name: 'api.room.leave', methods: ['GET'])]
-    #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function leave(
         GameRoom                $room,
         EntityManagerInterface  $entityManager,
@@ -148,14 +148,14 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[Route('/{roomId<\d+>}', name: 'api.room.get_by_id', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
     #[OA\Parameter(
         name: 'roomId',
         description: 'The game room ID',
         in: 'path',
         schema: new OA\Schema(type: 'integer')
     )]
-    #[Route('/{roomId<\d+>}', name: 'api.room.get_by_id', methods: ['GET'])]
-    #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function get_by_id(
         GameRoom                $room,
         SerializerInterface     $serializer
@@ -236,14 +236,14 @@ class GameRoomController extends AbstractController
         );
     }
 
+    #[Route('/{roomId<\d+>}/pledge/next', name: 'api.room.next_pledge', methods: ['GET'])]
+    #[ParamConverter('room', options: ['id' => 'roomId'])]
     #[OA\Parameter(
         name: 'roomId',
         description: 'The game room ID',
         in: 'path',
         schema: new OA\Schema(type: 'integer')
     )]
-    #[Route('/{roomId<\d+>}/pledge/next', name: 'api.room.next_pledge', methods: ['GET'])]
-    #[ParamConverter('room', options: ['id' => 'roomId'])]
     public function next_pledge(
         GameRoom                $room,
         SerializerInterface     $serializer,
