@@ -19,13 +19,14 @@ class GameRoom
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Assert\NotNull]
+    #[Assert\NotBlank(groups: ['room:create'])]
+    #[Assert\NotNull(groups: ['room:create'])]
     #[Assert\Length(
         min: 3,
         max: 24,
         minMessage: 'Your username must be at least {{ limit }} characters long',
         maxMessage: 'Your username cannot be longer than {{ limit }} characters',
+        groups: ['room:create']
     )]
     #[Groups(['room:create', 'room:base', 'room:detail'])]
     private ?string $name = null;
