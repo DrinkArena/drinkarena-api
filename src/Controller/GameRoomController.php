@@ -259,8 +259,9 @@ class GameRoomController extends AbstractController
             throw new BadRequestException('The game session is over');
         }
 
-        $pledgeId = array_rand($pledgeRepository->findParticipantPledgeIds($room));
-        $pledge = $pledgeRepository->find($pledgeId);
+        $pledgeIds = $pledgeRepository->findParticipantPledgeIds($room);
+        $pledgeRandIdx = array_rand($pledgeIds);
+        $pledge = $pledgeRepository->find($pledgeIds[$pledgeRandIdx]);
 
         if ($room->getState() === 'WAITING_PLAYER') {
             $room->setState('STARTED');
