@@ -32,3 +32,7 @@ $ cd drinkarena-api
 (drinkarena-api) $ php bin/console lexik:jwt:generate-keypair # Make sure openssl is installed
 (drinkarena-api) $ symfony server:start
 ```
+
+> Lien d'installation d'OpenSSL pour windows si la commande **"lexik:jwt:generate-keypair"** ne fonctionne pas :
+> https://slproweb.com/download/Win64OpenSSL-3_1_1.exe S'assurer que la commande **openssl** fonctionne dans le shell 
+> après la procédure
