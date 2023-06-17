@@ -36,3 +36,33 @@ $ cd drinkarena-api
 > Lien d'installation d'OpenSSL pour windows si la commande **"lexik:jwt:generate-keypair"** ne fonctionne pas :
 > https://slproweb.com/download/Win64OpenSSL-3_1_1.exe S'assurer que la commande **openssl** fonctionne dans le shell 
 > après la procédure
+
+## Available Routes
+
+### GameRoom
+
+- ``GET /api/v1/room/{roomId}``
+- ``GET /api/v1/room/{roomId}/join``
+- ``GET /api/v1/room/{roomId}/leave``
+- ``GET /api/v1/room/{roomId}/pledge/next``
+- ``GET /api/v1/room``
+- ``POST /api/v1/room``
+
+### Auth
+
+- ``POST /api/v1/login_check``
+- ``POST /api/v1/refresh_token``
+
+### Pledge
+
+- ``DELETE /api/v1/pledge/{pledgeId}``
+- ``POST /api/v1/pledge``
+
+### User
+
+- ``GET /api/v1/users``
+- ``GET /api/v1/user/{userId}``
+- ``GET /api/v1/user/me``
+- ``GET /api/v1/user/request-forgot-password``
+- ``POST /api/v1/user``
+- ``POST /api/v1/user/recover-password``
