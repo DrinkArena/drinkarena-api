@@ -6,9 +6,10 @@
 
 #### Requirements
 
-- PHP >= 8.1
+- PHP/XAMPP >= 8.1
 - Symfony CLI
 - Composer
+- OpenSSL ([Win64 Installer](https://slproweb.com/download/Win64OpenSSL-3_1_1.exe))
 
 #### Git configuration
 
@@ -22,6 +23,10 @@ $ cd drinkarena-api
 > ⚠️ You need to configure the Mercure Hub and the Mail Provider in **.env** file for all features :
 > **MAILER_DSN, MERCURE_URL, MERCURE_PUBLIC_URL, MERCURE_JWT_SECRET**
 
+#### To be added to the Env file
+
+`MAILER_DSN`=sendinblue+api://<YOUR_SENDINBLUE_API_KEY>@default
+
 #### Configure project & Launch
 
 ```sh
@@ -33,11 +38,21 @@ $ cd drinkarena-api
 (drinkarena-api) $ symfony server:start
 ```
 
-> Lien d'installation d'OpenSSL pour windows si la commande **"lexik:jwt:generate-keypair"** ne fonctionne pas :
-> https://slproweb.com/download/Win64OpenSSL-3_1_1.exe S'assurer que la commande **openssl** fonctionne dans le shell 
-> après la procédure
-
 ## Available Routes
+
+### Auth
+
+- ``POST /api/v1/login_check``
+- ``POST /api/v1/refresh_token``
+
+### User
+
+- ``GET /api/v1/users``
+- ``GET /api/v1/user/{userId}``
+- ``GET /api/v1/user/me``
+- ``GET /api/v1/user/request-forgot-password``
+- ``POST /api/v1/user``
+- ``POST /api/v1/user/recover-password``
 
 ### GameRoom
 
@@ -48,21 +63,7 @@ $ cd drinkarena-api
 - ``GET /api/v1/room``
 - ``POST /api/v1/room``
 
-### Auth
-
-- ``POST /api/v1/login_check``
-- ``POST /api/v1/refresh_token``
-
 ### Pledge
 
 - ``DELETE /api/v1/pledge/{pledgeId}``
 - ``POST /api/v1/pledge``
-
-### User
-
-- ``GET /api/v1/users``
-- ``GET /api/v1/user/{userId}``
-- ``GET /api/v1/user/me``
-- ``GET /api/v1/user/request-forgot-password``
-- ``POST /api/v1/user``
-- ``POST /api/v1/user/recover-password``
