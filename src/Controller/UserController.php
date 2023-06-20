@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -189,7 +190,12 @@ class UserController extends AbstractController
             ->subject('Drink Arena - Mot de passe oublié')
             ->text('Votre code de récupération pour changer de mot de passe, il sera valable pendant 2 heures : ' . $recoverCode)
         ;
-        $mailer->send($email); // todo: handle error of email sender
+
+        try {
+            $mailer->send($email);
+        } catch (TransportExceptionInterface $e) {
+            throw new BadRequestException('Failed to send email with recovery code, err : ', $e->getMessage());
+        }
 
         return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'json'], false);
     }
