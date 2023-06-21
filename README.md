@@ -67,3 +67,7 @@ $ cd drinkarena-api
 
 - ``DELETE /api/v1/pledge/{pledgeId}``
 - ``POST /api/v1/pledge``
+
+## API Documentation
+
+See [OpenAPI PDF Doc](drinkarena-openapi-doc.pdf) (17/06/2023)
