@@ -156,6 +156,11 @@ class GameRoomController extends AbstractController
         in: 'path',
         schema: new OA\Schema(type: 'integer')
     )]
+    #[OA\Response(
+        response: 200,
+        description: 'Get detailed room infos',
+        content: new Model(type: GameRoom::class, groups: ['room:detail'])
+    )]
     public function get_by_id(
         GameRoom                $room,
         SerializerInterface     $serializer
