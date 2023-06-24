@@ -109,4 +109,28 @@ class PledgeController extends AbstractController
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT, ['accept' => 'json'], false);
     }
+
+    #[Route('/me', name: 'api.pledge.get_self', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Return its own pledges',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Pledge::class, groups: ['pledge:base']))
+        )
+    )]
+    public function get_self(
+        PledgeRepository        $pledgeRepository,
+        SerializerInterface     $serializer
+    ): JsonResponse
+    {
+        $pledges = $pledgeRepository->findBy(['owner' => $this->getUser()], ['createdAt' => 'DESC'], 30);
+
+        return new JsonResponse(
+            $serializer->serialize($pledges, 'json', SerializationContext::create()->setGroups(['pledge:base'])),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
+    }
 }
