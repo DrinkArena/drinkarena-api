@@ -3,6 +3,5 @@
 .gitignore
 .git/
 .idea/
-.docker/
 docker-compose.yml
-
+/config/jwt
