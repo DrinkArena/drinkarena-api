@@ -1,5 +1,7 @@
 version: '3.9'
 
+# todo: fix swagger ui documentation in staging environment
+
 services:
   php:
     container_name: drinkarena-api-php
