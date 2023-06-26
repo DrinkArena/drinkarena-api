@@ -83,7 +83,7 @@ class GameRoomController extends AbstractController
         return new JsonResponse(
             $serializer->serialize($gameRoom, 'json', SerializationContext::create()->setGroups(['room:base'])),
             Response::HTTP_CREATED,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             true
         );
     }
@@ -113,7 +113,7 @@ class GameRoomController extends AbstractController
         return new JsonResponse(
             null,
             Response::HTTP_OK,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             false
         );
     }
@@ -143,7 +143,7 @@ class GameRoomController extends AbstractController
         return new JsonResponse(
             null,
             Response::HTTP_OK,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             false
         );
     }
@@ -169,7 +169,7 @@ class GameRoomController extends AbstractController
         return new JsonResponse(
             $serializer->serialize($room, 'json', SerializationContext::create()->setGroups(['room:detail'])),
             Response::HTTP_OK,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             true
         );
     }
@@ -236,7 +236,7 @@ class GameRoomController extends AbstractController
         return new JsonResponse(
             $serializer->serialize($rooms, 'json', SerializationContext::create()->setGroups(['room:base'])),
             Response::HTTP_OK,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             true
         );
     }
@@ -279,7 +279,7 @@ class GameRoomController extends AbstractController
         return new JsonResponse(
             $serializer->serialize($pledge, 'json', SerializationContext::create()->setGroups(['pledge:detail'])),
             Response::HTTP_OK,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             true
         );
     }

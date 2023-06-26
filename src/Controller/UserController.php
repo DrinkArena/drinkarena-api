@@ -59,7 +59,7 @@ class UserController extends AbstractController
             'json',
             SerializationContext::create()->setGroups(['user:base'])
         );
-        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
+        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'application/json'], true);
     }
 
     #[Route('/me', name: 'api.user.get_self', methods: ['GET'])]
@@ -77,7 +77,7 @@ class UserController extends AbstractController
             'json',
             SerializationContext::create()->setGroups(['user:base'])
         );
-        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
+        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'application/json'], true);
     }
 
     #[Route('s', name: 'api.user.get_all', methods: ['GET'])]
@@ -100,7 +100,7 @@ class UserController extends AbstractController
             'json',
             SerializationContext::create()->setGroups(['user:base'])
         );
-        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'json'], true);
+        return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'application/json'], true);
     }
 
     #[Route('', name: 'api.user.create', methods: ['POST'])]
@@ -197,7 +197,7 @@ class UserController extends AbstractController
             throw new BadRequestException('Failed to send email with recovery code, err : ', $e->getMessage());
         }
 
-        return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'json'], false);
+        return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'application/json'], false);
     }
 
     #[Route('/recover-password', name: 'api.user.recover_password', methods: ['POST'])]
@@ -244,6 +244,6 @@ class UserController extends AbstractController
         $user->setRecoveryCodeExpiration(null);
         $userRepository->save($user, true);
 
-        return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'json'], false);
+        return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'application/json'], false);
     }
 }

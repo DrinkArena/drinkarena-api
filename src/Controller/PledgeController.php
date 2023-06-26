@@ -107,7 +107,7 @@ class PledgeController extends AbstractController
 
         $pledgeRepository->remove($pledge, true);
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT, ['accept' => 'json'], false);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT, ['accept' => 'application/json'], false);
     }
 
     #[Route('/me', name: 'api.pledge.get_self', methods: ['GET'])]
@@ -129,7 +129,7 @@ class PledgeController extends AbstractController
         return new JsonResponse(
             $serializer->serialize($pledges, 'json', SerializationContext::create()->setGroups(['pledge:base'])),
             Response::HTTP_OK,
-            ['accept' => 'json'],
+            ['accept' => 'application/json'],
             true
         );
     }
