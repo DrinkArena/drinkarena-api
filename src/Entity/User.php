@@ -23,13 +23,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 24, unique: true)]
-    #[Groups(['user:base', 'user:register', 'room:base', 'room:detail', 'pledge:detail'])]
+    #[Groups(['user:base', 'user:register', 'room:base', 'room:detail', 'pledge:detail', 'user:update'])]
     #[Assert\Length(
         min: 2,
         max: 24,
         minMessage: 'Your username must be at least {{ limit }} characters long',
         maxMessage: 'Your username cannot be longer than {{ limit }} characters',
-        groups: ['user:register']
+        groups: ['user:register', 'user:update']
     )]
     private ?string $username = null;
 
@@ -41,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     #[ORM\Column]
-    #[Groups(['user:register', 'user:recover-password'])]
+    #[Groups(['user:register', 'user:recover-password', 'user:update'])]
     private ?string $password = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
@@ -49,10 +49,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(['user:base', 'user:register', 'user:recover-password'])]
-    #[Assert\Email(message: 'The email {{ value }} is not valid.', groups: ['user:register', 'user:recover-password'])]
-    #[Assert\NotBlank(groups: ['user:register', 'user:recover-password'])]
-    #[Assert\NotNull(groups: ['user:register', 'user:recover-password'])]
+    #[Groups(['user:base', 'user:register', 'user:recover-password', 'user:update'])]
+    #[Assert\Email(message: 'The email {{ value }} is not valid.', groups: ['user:register', 'user:recover-password', 'user:update'])]
+    #[Assert\NotBlank(groups: ['user:register', 'user:recover-password', 'user:update'])]
+    #[Assert\NotNull(groups: ['user:register', 'user:recover-password', 'user:update'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 32, nullable: true)]
