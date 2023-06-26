@@ -64,13 +64,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $recoveryCodeExpiration = null;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: GameRoom::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: GameRoom::class, cascade: ['remove'])]
     private Collection $ownedRooms;
 
     #[ORM\ManyToMany(targetEntity: GameRoom::class, mappedBy: 'participants')]
     private Collection $playedRooms;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pledge::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pledge::class, cascade: ['remove'])]
     private Collection $pledges;
 
     public function __construct()

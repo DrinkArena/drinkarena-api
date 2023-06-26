@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-// todo: remove self user
 // todo: export personal data for RGPD
 
 #[Route('/api/v1/user')]
@@ -298,5 +297,16 @@ class UserController extends AbstractController
             ['accept' => 'application/json'],
             true
         );
+    }
+
+    #[Route('', name: 'api.user.delete', methods: ['DELETE'])]
+    public function delete(
+        UserRepository  $userRepository
+    ): JsonResponse
+    {
+        $user = $userRepository->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
+        $userRepository->remove($user, true);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT, ['accept' => 'application/json'], false);
     }
 }
