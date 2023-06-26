@@ -24,6 +24,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+// todo: remove self user
+// todo: export personal data for RGPD
+
 #[Route('/api/v1/user')]
 #[OA\Tag(name: 'User')]
 #[OA\Response(
@@ -245,5 +248,55 @@ class UserController extends AbstractController
         $userRepository->save($user, true);
 
         return new JsonResponse(null, Response::HTTP_OK, ['accept' => 'application/json'], false);
+    }
+
+    #[Route('', name: 'api.user.update_self', methods: ['PATCH'])]
+    #[OA\RequestBody(
+        description: 'Specify fields that you want to update',
+        content: new Model(type: User::class, groups: ['user:update'])
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns your updated user',
+        content: new Model(type: User::class, groups: ['user:base'])
+    )]
+    public function update_self(
+        Request                     $request,
+        SerializerInterface         $serializer,
+        ValidatorInterface          $validator,
+        UserPasswordHasherInterface $userPasswordHasher,
+        UserRepository              $userRepository
+    ): JsonResponse
+    {
+        $user = $userRepository->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
+
+        $userInput = $serializer->deserialize(
+            $request->getContent(),
+            User::class,
+            'json',
+            DeserializationContext::create()->setGroups(['user:update'])
+        );
+
+        $user->setUsername($userInput->getUsername() ?? $user->getUsername());
+        $user->setEmail($userInput->getEmail() ?? $user->getEmail());
+        if (empty($userInput->getPassword())) {
+            $user->setPassword($user->getPassword());
+        } else {
+            $user->setPassword($userPasswordHasher->hashPassword($user, $userInput->getPassword()));
+        }
+
+        $errors = $validator->validate($user, null, ['user:update']);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $userRepository->save($user, true);
+
+        return new JsonResponse(
+            $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['user:base'])),
+            Response::HTTP_OK,
+            ['accept' => 'application/json'],
+            true
+        );
     }
 }
