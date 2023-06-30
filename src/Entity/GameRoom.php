@@ -51,15 +51,11 @@ class GameRoom
     #[Groups(['room:detail'])]
     private Collection $participants;
 
-    #[ORM\ManyToMany(targetEntity: Pledge::class, inversedBy: 'roomPlayed')]
-    private Collection $pledgePlayed;
-
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->state = 'WAITING_PLAYER';
         $this->participants = new ArrayCollection();
-        $this->pledgePlayed = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -135,30 +131,6 @@ class GameRoom
     public function removeParticipant(User $participant): self
     {
         $this->participants->removeElement($participant);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Pledge>
-     */
-    public function getPledgePlayed(): Collection
-    {
-        return $this->pledgePlayed;
-    }
-
-    public function addPledgePlayed(Pledge $pledgePlayed): self
-    {
-        if (!$this->pledgePlayed->contains($pledgePlayed)) {
-            $this->pledgePlayed->add($pledgePlayed);
-        }
-
-        return $this;
-    }
-
-    public function removePledgePlayed(Pledge $pledgePlayed): self
-    {
-        $this->pledgePlayed->removeElement($pledgePlayed);
 
         return $this;
     }

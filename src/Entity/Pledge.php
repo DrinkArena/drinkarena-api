@@ -33,14 +33,10 @@ class Pledge
     #[Groups(['pledge:base', 'pledge:detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\ManyToMany(targetEntity: GameRoom::class, mappedBy: 'pledgePlayed')]
-    private Collection $roomPlayed;
-
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->type = 'ACTION';
-        $this->roomPlayed = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,33 +88,6 @@ class Pledge
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, GameRoom>
-     */
-    public function getRoomPlayed(): Collection
-    {
-        return $this->roomPlayed;
-    }
-
-    public function addRoomPlayed(GameRoom $roomPlayed): self
-    {
-        if (!$this->roomPlayed->contains($roomPlayed)) {
-            $this->roomPlayed->add($roomPlayed);
-            $roomPlayed->addPledgePlayed($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRoomPlayed(GameRoom $roomPlayed): self
-    {
-        if ($this->roomPlayed->removeElement($roomPlayed)) {
-            $roomPlayed->removePledgePlayed($this);
-        }
 
         return $this;
     }
