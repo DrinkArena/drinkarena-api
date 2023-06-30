@@ -68,7 +68,7 @@ class UserController extends AbstractController
     #[OA\Response(
         response: 200,
         description: 'Return current connected user infos',
-        content: new Model(type: User::class, groups: ['user:base'])
+        content: new Model(type: User::class, groups: ['user:base', 'user:details'])
     )]
     public function get_self(
         SerializerInterface $serializer
@@ -77,7 +77,7 @@ class UserController extends AbstractController
         $userInfos = $serializer->serialize(
             $this->getUser(),
             'json',
-            SerializationContext::create()->setGroups(['user:base'])
+            SerializationContext::create()->setGroups(['user:base', 'user:details'])
         );
         return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'application/json'], true);
     }
@@ -89,7 +89,7 @@ class UserController extends AbstractController
         description: 'Return all users infos in list (only admin)',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: User::class, groups: ['user:base']))
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['user:base', 'user:details']))
         )
     )]
     public function get_all(
@@ -100,7 +100,7 @@ class UserController extends AbstractController
         $userInfos = $serializer->serialize(
             $userRepository->findAll(),
             'json',
-            SerializationContext::create()->setGroups(['user:base'])
+            SerializationContext::create()->setGroups(['user:base', 'user:details'])
         );
         return new JsonResponse($userInfos, Response::HTTP_OK, ['accept' => 'application/json'], true);
     }
@@ -113,7 +113,7 @@ class UserController extends AbstractController
     #[OA\Response(
         response: 201,
         description: 'Create user account (registration)',
-        content: new Model(type: User::class, groups: ['user:base'])
+        content: new Model(type: User::class, groups: ['user:base', 'user:details'])
     )]
     public function create(
         UserPasswordHasherInterface $userPasswordHasher,
@@ -145,7 +145,7 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(
-            $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['user:base'])),
+            $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['user:base', 'user:details'])),
             Response::HTTP_CREATED,
             ['accept' => 'json'],
             true
@@ -257,7 +257,7 @@ class UserController extends AbstractController
     #[OA\Response(
         response: 200,
         description: 'Returns your updated user',
-        content: new Model(type: User::class, groups: ['user:base'])
+        content: new Model(type: User::class, groups: ['user:base', 'user:details'])
     )]
     public function update_self(
         Request                     $request,
@@ -292,7 +292,7 @@ class UserController extends AbstractController
         $userRepository->save($user, true);
 
         return new JsonResponse(
-            $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['user:base'])),
+            $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['user:base', 'user:details'])),
             Response::HTTP_OK,
             ['accept' => 'application/json'],
             true
