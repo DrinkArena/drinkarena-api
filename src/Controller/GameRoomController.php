@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\PlayedPledge;
 use App\Entity\User;
 use App\Entity\GameRoom;
+use App\Repository\PlayedPledgeRepository;
 use App\Repository\PledgeRepository;
 use OpenApi\Attributes as OA;
 use App\Repository\UserRepository;
@@ -54,6 +56,7 @@ class GameRoomController extends AbstractController
         UserRepository          $userRepository
     ): JsonResponse
     {
+        // todo: auto leave other active room if user want to create new room
         $inputGameRoom = $serializer->deserialize(
             $request->getContent(),
             GameRoom::class,
@@ -253,7 +256,8 @@ class GameRoomController extends AbstractController
         GameRoom                $room,
         SerializerInterface     $serializer,
         PledgeRepository        $pledgeRepository,
-        GameRoomRepository      $gameRoomRepository
+        GameRoomRepository      $gameRoomRepository,
+        PlayedPledgeRepository  $playedPledgeRepository
     ): JsonResponse
     {
         if ($room->getOwner() !== $this->getUser()) {
@@ -270,8 +274,17 @@ class GameRoomController extends AbstractController
 
         if ($room->getState() === 'WAITING_PLAYER') {
             $room->setState('STARTED');
-            $gameRoomRepository->save($room, true);
         }
+
+        if ($playedPledgeRepository->count(['room' => $room]) >= 29) {
+            $room->setState('FINISHED');
+        }
+
+        $playedPledge = (new PlayedPledge())
+            ->setRoom($room)
+            ->setPledge($pledge);
+        $gameRoomRepository->save($room, true);
+        $playedPledgeRepository->save($playedPledge, true);
 
         // todo: count number of pledges elapsed in game session
         // todo: allow to add default pledge if there aren't enough user pledges
