@@ -51,11 +51,15 @@ class GameRoom
     #[Groups(['room:detail'])]
     private Collection $participants;
 
+    #[ORM\OneToMany(mappedBy: 'room', targetEntity: PlayedPledge::class)]
+    private Collection $playedPledges;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->state = 'WAITING_PLAYER';
         $this->participants = new ArrayCollection();
+        $this->playedPledges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +135,36 @@ class GameRoom
     public function removeParticipant(User $participant): self
     {
         $this->participants->removeElement($participant);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PlayedPledge>
+     */
+    public function getPlayedPledges(): Collection
+    {
+        return $this->playedPledges;
+    }
+
+    public function addPlayedPledge(PlayedPledge $playedPledge): self
+    {
+        if (!$this->playedPledges->contains($playedPledge)) {
+            $this->playedPledges->add($playedPledge);
+            $playedPledge->setRoom($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlayedPledge(PlayedPledge $playedPledge): self
+    {
+        if ($this->playedPledges->removeElement($playedPledge)) {
+            // set the owning side to null (unless already changed)
+            if ($playedPledge->getRoom() === $this) {
+                $playedPledge->setRoom(null);
+            }
+        }
 
         return $this;
     }

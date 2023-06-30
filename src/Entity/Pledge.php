@@ -33,10 +33,14 @@ class Pledge
     #[Groups(['pledge:base', 'pledge:detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'pledge', targetEntity: PlayedPledge::class)]
+    private Collection $playedPledges;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->type = 'ACTION';
+        $this->playedPledges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,6 +92,36 @@ class Pledge
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PlayedPledge>
+     */
+    public function getPlayedPledges(): Collection
+    {
+        return $this->playedPledges;
+    }
+
+    public function addPlayedPledge(PlayedPledge $playedPledge): self
+    {
+        if (!$this->playedPledges->contains($playedPledge)) {
+            $this->playedPledges->add($playedPledge);
+            $playedPledge->setPledge($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlayedPledge(PlayedPledge $playedPledge): self
+    {
+        if ($this->playedPledges->removeElement($playedPledge)) {
+            // set the owning side to null (unless already changed)
+            if ($playedPledge->getPledge() === $this) {
+                $playedPledge->setPledge(null);
+            }
+        }
 
         return $this;
     }
