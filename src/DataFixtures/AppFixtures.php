@@ -48,6 +48,24 @@ class AppFixtures extends Fixture
 
     private function makeUser(int $it): void
     {
+        $userEsteban = new User();
+        $userEsteban
+            ->setUsername('esteban')
+            ->setPassword($this->userPasswordHasher->hashPassword($userEsteban, 'Test#69'))
+            ->setEmail('esteban.ristich@protonmail.com')
+            ->setRoles(['ROLE_USER'])
+        ;
+        $this->manager->persist($userEsteban);
+
+        $userIsmael = new User();
+        $userIsmael
+            ->setUsername('ismael')
+            ->setPassword($this->userPasswordHasher->hashPassword($userIsmael, 'Test#69'))
+            ->setEmail('hacquin.ismael@gmail.com')
+            ->setRoles(['ROLE_USER'])
+        ;
+        $this->manager->persist($userIsmael);
+
         for ($i = 0; $i < $it; $i++) {
             $user = new User();
             $user
