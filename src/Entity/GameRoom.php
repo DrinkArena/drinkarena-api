@@ -15,7 +15,7 @@ class GameRoom
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['room:base', 'room:detail'])]
+    #[Groups(['room:base', 'room:detail', 'user:history'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -28,23 +28,23 @@ class GameRoom
         maxMessage: 'Your username cannot be longer than {{ limit }} characters',
         groups: ['room:create']
     )]
-    #[Groups(['room:create', 'room:base', 'room:detail'])]
+    #[Groups(['room:create', 'room:base', 'room:detail', 'user:history'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'ownedRooms')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['room:base', 'room:detail'])]
+    #[Groups(['room:base', 'room:detail', 'user:history'])]
     private ?User $owner = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\NotNull]
     #[Assert\Choice(choices: ['WAITING_PLAYER', 'STARTED', 'FINISHED'])]
-    #[Groups(['room:base', 'room:detail'])]
+    #[Groups(['room:base', 'room:detail', 'user:history'])]
     private ?string $state = null;
 
     #[ORM\Column]
-    #[Groups(['room:base', 'room:detail'])]
+    #[Groups(['room:base', 'room:detail', 'user:history'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'playedRooms')]

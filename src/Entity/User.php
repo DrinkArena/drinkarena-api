@@ -19,11 +19,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:base', 'room:base', 'room:detail', 'pledge:detail'])]
+    #[Groups(['user:base', 'room:base', 'room:detail', 'pledge:detail', 'user:history'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 24, unique: true)]
-    #[Groups(['user:base', 'user:register', 'room:base', 'room:detail', 'pledge:detail', 'user:update'])]
+    #[Groups(['user:base', 'user:register', 'room:base', 'room:detail', 'pledge:detail', 'user:update', 'user:history'])]
     #[Assert\Length(
         min: 2,
         max: 24,
