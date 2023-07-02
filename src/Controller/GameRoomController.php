@@ -56,7 +56,6 @@ class GameRoomController extends AbstractController
         UserRepository          $userRepository
     ): JsonResponse
     {
-        // todo: auto leave other active room if user want to create new room
         $inputGameRoom = $serializer->deserialize(
             $request->getContent(),
             GameRoom::class,
@@ -69,9 +68,12 @@ class GameRoomController extends AbstractController
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
 
-        // Check if there are already game in progress
-        if (!empty($gameRoomRepository->checkToJoinGame($userRepository->find($this->getUser())))) {
-            return new JsonResponse(null, Response::HTTP_BAD_REQUEST, [], false);
+        // exit all rooms in which the user is currently enrolled
+        foreach ($gameRoomRepository->checkToJoinGame($userRepository->find($this->getUser())) as $roomId) {
+            $this->forward(
+                'App\Controller\GameRoomController::leave',
+                ['roomId' => $roomId]
+            );
         }
 
         $user = $entityManager->getRepository(User::class)->find($this->getUser());
@@ -106,8 +108,13 @@ class GameRoomController extends AbstractController
     ): JsonResponse
     {
         $user = $entityManager->getRepository(User::class)->find($this->getUser());
-        if (!empty($gameRoomRepository->checkToJoinGame($user))) {
-            return new JsonResponse(null, Response::HTTP_BAD_REQUEST, [], false);
+
+        // exit all rooms in which the user is currently enrolled
+        foreach ($gameRoomRepository->checkToJoinGame($user) as $roomId) {
+            $this->forward(
+                'App\Controller\GameRoomController::leave',
+                ['roomId' => $roomId]
+            );
         }
 
         $room->addParticipant($user);
