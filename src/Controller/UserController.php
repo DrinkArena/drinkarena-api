@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\GameRoom;
 use App\Entity\User;
+use App\Repository\GameRoomRepository;
 use OpenApi\Attributes as OA;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -308,5 +310,30 @@ class UserController extends AbstractController
         $userRepository->remove($user, true);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT, ['accept' => 'application/json'], false);
+    }
+
+    #[Route('/history/me', name: 'api.user.self_history', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Return self user history of elapsed games',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: GameRoom::class, groups: ['user:history']))
+        )
+    )]
+    public function self_history(
+        SerializerInterface $serializer,
+        UserRepository      $userRepository,
+        GameRoomRepository  $gameRoomRepository
+    ): JsonResponse
+    {
+        $currentUser = $userRepository->find($this->getUser());
+        $history = $gameRoomRepository->findUserElapsedGameHistory($currentUser);
+        return new JsonResponse(
+            $serializer->serialize($history, 'json', SerializationContext::create()->setGroups(['user:history'])),
+            Response::HTTP_OK,
+            ['accept' => 'application/json'],
+            true
+        );
     }
 }
