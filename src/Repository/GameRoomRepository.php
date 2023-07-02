@@ -54,6 +54,20 @@ class GameRoomRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findUserElapsedGameHistory(User $user): array
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.participants', 'p')
+            ->addSelect('p')
+            ->where('p.id = :userId')
+            ->andWhere('u.state = :roomState')
+            ->setParameter('userId', $user->getId())
+            ->setParameter('roomState', 'FINISHED')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    /**
 //     * @return GameRoom[] Returns an array of GameRoom objects
 //     */
