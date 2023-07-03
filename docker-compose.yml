@@ -1,7 +1,5 @@
 version: '3.9'
 
-# todo: fix swagger ui documentation in staging environment
-
 services:
   php:
     container_name: drinkarena-api-php
@@ -16,9 +14,31 @@ services:
       context: .
       dockerfile: .docker/nginx/Dockerfile
     ports:
-      - "80:80"
+      - "8080:80"
     networks:
       - drinkarena_net
+    depends_on:
+      - php
+  mercure:
+    image: dunglas/mercure
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      SERVER_NAME: ':3000'
+      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins http://127.0.0.1:8080
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+    volumes:
+      - mercure_data:/data
+      - mercure_config:/config
 
 networks:
   drinkarena_net:
+
+volumes:
+  mercure_data:
+  mercure_config:
