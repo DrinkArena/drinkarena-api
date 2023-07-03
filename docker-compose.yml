@@ -35,6 +35,28 @@ services:
     volumes:
       - mercure_data:/data
       - mercure_config:/config
+  swag:
+    image: lscr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - URL=eristich.dev
+      - SUBDOMAINS=drinkarena-staging,
+      - ONLY_SUBDOMAINS=true
+    volumes:
+      - .docker/config:/config
+    ports:
+      - "443:443"
+      - "80:80"
+    networks:
+      - drinkarena_net
+    restart: unless-stopped
+    depends_on:
+      - nginx
 
 networks:
   drinkarena_net:
