@@ -36,6 +36,8 @@ services:
     volumes:
       - mercure_data:/data
       - mercure_config:/config
+    networks:
+      - drinkarena_net
   swag:
     image: lscr.io/linuxserver/swag
     container_name: swag
