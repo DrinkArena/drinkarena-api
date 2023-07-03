@@ -19,6 +19,7 @@ services:
       - drinkarena_net
     depends_on:
       - php
+      - mercure
   mercure:
     image: dunglas/mercure
     restart: unless-stopped
