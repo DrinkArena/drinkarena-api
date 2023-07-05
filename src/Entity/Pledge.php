@@ -14,23 +14,23 @@ class Pledge
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['pledge:base', 'pledge:detail'])]
+    #[Groups(['pledge:base', 'pledge:detail', 'room:current-pledge'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['pledge:base', 'pledge:detail', 'pledge:create'])]
+    #[Groups(['pledge:base', 'pledge:detail', 'pledge:create', 'room:current-pledge'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['pledge:base', 'pledge:detail'])]
+    #[Groups(['pledge:base', 'pledge:detail', 'room:current-pledge'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'pledges')]
-    #[Groups(['pledge:detail'])]
+    #[Groups(['pledge:detail', 'room:current-pledge'])]
     private ?User $owner = null;
 
     #[ORM\Column]
-    #[Groups(['pledge:base', 'pledge:detail'])]
+    #[Groups(['pledge:base', 'pledge:detail', 'room:current-pledge'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'pledge', targetEntity: PlayedPledge::class)]

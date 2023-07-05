@@ -54,6 +54,9 @@ class GameRoom
     #[ORM\OneToMany(mappedBy: 'room', targetEntity: PlayedPledge::class)]
     private Collection $playedPledges;
 
+    #[Groups(['room:current-pledge'])]
+    private ?Pledge $currentPledge = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -165,6 +168,18 @@ class GameRoom
                 $playedPledge->setRoom(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCurrentPledge(): ?Pledge
+    {
+        return $this->currentPledge;
+    }
+
+    public function setCurrentPledge(?Pledge $currentPledge): self
+    {
+        $this->currentPledge = $currentPledge;
 
         return $this;
     }
