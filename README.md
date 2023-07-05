@@ -70,4 +70,4 @@ $ cd drinkarena-api
 
 ## API Documentation
 
-See [OpenAPI PDF Doc](drinkarena-openapi-doc.pdf) (17/06/2023)
+See [OpenAPI PDF Doc](drinkarena-openapi-doc.pdf) (03/07/2023)
