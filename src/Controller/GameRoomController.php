@@ -17,6 +17,8 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use JMS\Serializer\DeserializationContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -104,21 +106,45 @@ class GameRoomController extends AbstractController
     public function join(
         GameRoom                $room,
         EntityManagerInterface  $entityManager,
-        GameRoomRepository      $gameRoomRepository
+        GameRoomRepository      $gameRoomRepository,
+        HubInterface            $hub,
     ): JsonResponse
     {
         $user = $entityManager->getRepository(User::class)->find($this->getUser());
 
         // exit all rooms in which the user is currently enrolled
         foreach ($gameRoomRepository->checkToJoinGame($user) as $roomId) {
-            $this->forward(
-                'App\Controller\GameRoomController::leave',
-                ['roomId' => $roomId]
-            );
+            if ($roomId['id'] !== $room->getId()) {
+                $this->forward(
+                    'App\Controller\GameRoomController::leave',
+                    ['roomId' => $roomId]
+                );
+            }
         }
+
+        // dd(['process' => $processCourse, 'called' => $room->getId()]);
 
         $room->addParticipant($user);
         $gameRoomRepository->save($room, true);
+
+        $participants = $room->getParticipants()->toArray();
+        $participantResults = [];
+        foreach ($participants as $i) {
+            $participantResults[] = ['id' => $i->getId(), 'username' => $i->getUsername()];
+        }
+
+        $update = new Update(
+            'http://drinkarena.play/room/' . $room->getId(),
+            json_encode([
+                'action' => [
+                    'method' => 'JOIN',
+                    'data' => []
+                ],
+                'status' => $room->getState(),
+                'participants' => $participantResults
+            ])
+        );
+        $hub->publish($update);
 
         return new JsonResponse(
             null,
@@ -139,7 +165,8 @@ class GameRoomController extends AbstractController
     public function leave(
         GameRoom                $room,
         EntityManagerInterface  $entityManager,
-        GameRoomRepository      $gameRoomRepository
+        GameRoomRepository      $gameRoomRepository,
+        HubInterface            $hub
     ): JsonResponse
     {
         $user = $entityManager->getRepository(User::class)->find($this->getUser());
@@ -149,6 +176,25 @@ class GameRoomController extends AbstractController
 
         $room->removeParticipant($user);
         $gameRoomRepository->save($room, true);
+
+        $participants = $room->getParticipants()->toArray();
+        $participantResults = [];
+        foreach ($participants as $i) {
+            $participantResults[] = ['id' => $i->getId(), 'username' => $i->getUsername()];
+        }
+
+        $update = new Update(
+            'http://drinkarena.play/room/' . $room->getId(),
+            json_encode([
+                'action' => [
+                    'method' => 'LEAVE',
+                    'data' => []
+                ],
+                'status' => $room->getState(),
+                'participants' => $participantResults
+            ])
+        );
+        $hub->publish($update);
 
         return new JsonResponse(
             null,
@@ -173,11 +219,16 @@ class GameRoomController extends AbstractController
     )]
     public function get_by_id(
         GameRoom                $room,
-        SerializerInterface     $serializer
+        SerializerInterface     $serializer,
+        PlayedPledgeRepository  $playedPledgeRepository
     ): JsonResponse
     {
+        $currentPledge = $playedPledgeRepository->findOneBy(['room' => $room], ['createdAt' => 'DESC']);
+        if ($currentPledge) {
+            $room->setCurrentPledge($currentPledge->getPledge());
+        }
         return new JsonResponse(
-            $serializer->serialize($room, 'json', SerializationContext::create()->setGroups(['room:detail'])),
+            $serializer->serialize($room, 'json', SerializationContext::create()->setGroups(['room:detail', 'room:current-pledge'])),
             Response::HTTP_OK,
             ['accept' => 'application/json'],
             true
@@ -264,7 +315,8 @@ class GameRoomController extends AbstractController
         SerializerInterface     $serializer,
         PledgeRepository        $pledgeRepository,
         GameRoomRepository      $gameRoomRepository,
-        PlayedPledgeRepository  $playedPledgeRepository
+        PlayedPledgeRepository  $playedPledgeRepository,
+        HubInterface            $hub
     ): JsonResponse
     {
         if ($room->getOwner() !== $this->getUser()) {
@@ -292,6 +344,29 @@ class GameRoomController extends AbstractController
             ->setPledge($pledge);
         $gameRoomRepository->save($room, true);
         $playedPledgeRepository->save($playedPledge, true);
+
+        $participants = $room->getParticipants()->toArray();
+        $participantResults = [];
+        foreach ($participants as $i) {
+            $participantResults[] = ['id' => $i->getId(), 'username' => $i->getUsername()];
+        }
+
+        $update = new Update(
+            'http://drinkarena.play/room/' . $room->getId(),
+            json_encode([
+                'action' => [
+                    'method' => 'NEXT_PLEDGE',
+                    'data' => [
+                        'id' => $pledge->getId(),
+                        'title' => $pledge->getTitle(),
+                        'created_at' => $pledge->getCreatedAt()
+                    ]
+                ],
+                'status' => $room->getState(),
+                'participants' => $participantResults
+            ])
+        );
+        $hub->publish($update);
 
         // todo: count number of pledges elapsed in game session
         // todo: allow to add default pledge if there aren't enough user pledges
